@@ -1,14 +1,14 @@
 <h1>Ajax Notes</h1>
 <script type="text/javascript">
 	$(document).ready(function(){
+		$('.submit').hide();
 		$('.new_note').submit(function(){
 			$.post(
 				$(this).attr('action'),
 				$(this).serialize(),
 				function(data){
-					console.log('Data received from the Ajax call ', data);
 					$('#all_notes').prepend(
-						"<div class='note'>"+
+						"<div class='note' id='"+ data.id +"'>"+
 							"<h3>"+data.title+"</h3>"+
 							"<button class='delete' id="+data.id+">Delete</button>"+
 							"<p>"+data.description+"</p>"+
@@ -20,26 +20,38 @@
 		});
 		$('.delete').click(function(){
 			var id = $(this).attr('id');
-			console.log(id);
 			$.ajax({
 				type: 'delete',
 				url: '/notes/'+id,
 			});
 			$(this).parent().hide();
 		});
+		$('textarea').on('blur', function(){
+			var id = $(this).parent().attr('id');
+			$.ajax({
+				type: 'put',
+				url: '/notes/'+id,
+				data: {description: $(this).val()}
+			});
+		});
 	});
 </script>
+
 <div id="all_notes">
 	<% if @notes %>
 		<% @notes.each do |note| %>
-			<div class="note">
+			<div class="note" id="<%= note.id %>">
 				<h3><%= note.title %></h3>
 				<button id="<%= note.id %>" class="delete">Delete</button>
-				<p><%= note.description %></p>
+				<form class="text" id="<%= note.id %>" action="notes/update/<%= note.id %>" method="post">
+					<input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+					<textarea name="description"><%= note.description %></textarea>
+				</form>
 			</div>
 		<% end %>
 	<% end %>
 </div>
+
 <h2>Add New Note</h2>
 <%= simple_form_for @note, url: notes_path, class: "new_note" do |f| %>
 	<%= f.input :title %>

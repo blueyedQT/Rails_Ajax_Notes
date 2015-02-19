@@ -13,7 +13,10 @@ class NotesController < ApplicationController
   	end
   end
 
-  def edit
+  def update
+  	@note = Note.find(params[:id]).update(description:params[:description])
+  	json_message = {action:"success"}
+  	render json: json_message
   end
 
   def destroy
