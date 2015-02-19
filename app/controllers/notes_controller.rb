@@ -10,6 +10,5 @@ class NotesController < ApplicationController
   		json_message = {title:params[:note][:title], description:params[:note][:description]}
   		render json: json_message
   	end
-
   end
 end
