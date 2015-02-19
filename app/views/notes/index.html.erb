@@ -1,2 +1,37 @@
-<h1>Notes#index</h1>
-<p>Find me in app/views/notes/index.html.erb</p>
+<h1>Ajax Notes</h1>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('.new_note').submit(function(){
+			$.post(
+				$(this).attr('action'),
+				$(this).serialize(),
+				function(data){
+					console.log('Data received from the Ajax call ', data);
+					$('#all_notes').prepend(
+						"<div class='note'>"+
+							"<h3>"+data.title+"</h3>"+
+							"<p>"+data.description+"</p>"+
+						"</div>");
+				},
+				'json'
+			);
+			return false;
+		});
+	});
+</script>
+<div id="all_notes">
+	<% if @notes %>
+		<% @notes.each do |note| %>
+			<div class="note">
+				<h3><%= note.title %></h3>
+				<p><%= note.description %></p>
+			</div>
+		<% end %>
+	<% end %>
+</div>
+<h2>Add New Note</h2>
+<%= simple_form_for @note, url: notes_create_path, class: "new_note" do |f| %>
+	<%= f.input :title %>
+	<%= f.input :description %>
+	<%= f.button :submit %>
+<% end %>
