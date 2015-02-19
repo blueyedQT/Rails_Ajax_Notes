@@ -10,12 +10,22 @@
 					$('#all_notes').prepend(
 						"<div class='note'>"+
 							"<h3>"+data.title+"</h3>"+
+							"<button class='delete' id="+data.id+">Delete</button>"+
 							"<p>"+data.description+"</p>"+
 						"</div>");
 				},
 				'json'
 			);
 			return false;
+		});
+		$('.delete').click(function(){
+			var id = $(this).attr('id');
+			console.log(id);
+			$.ajax({
+				type: 'delete',
+				url: '/notes/'+id,
+			});
+			$(this).parent().hide();
 		});
 	});
 </script>
@@ -24,13 +34,14 @@
 		<% @notes.each do |note| %>
 			<div class="note">
 				<h3><%= note.title %></h3>
+				<button id="<%= note.id %>" class="delete">Delete</button>
 				<p><%= note.description %></p>
 			</div>
 		<% end %>
 	<% end %>
 </div>
 <h2>Add New Note</h2>
-<%= simple_form_for @note, url: notes_create_path, class: "new_note" do |f| %>
+<%= simple_form_for @note, url: notes_path, class: "new_note" do |f| %>
 	<%= f.input :title %>
 	<%= f.input :description %>
 	<%= f.button :submit %>
